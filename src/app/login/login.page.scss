@@ -1,3 +1,56 @@
-mat-form-field{
-    border-radius: 20px !important;
+
+.backinput{
+    --background: #f7f7f7fb;
+    --color: rgb(0, 0, 0);
+    border-radius: 20px;
+    width: 90%;
+    margin: auto;
+    display: block;
 }
+
+.checkbox{
+    --background: #ffffff00;
+    // --color: rgb(0, 0, 0);
+    --background-activated :"#ffffff00";
+}
+
+ion-button{
+    --background: #7a0000;
+    margin: auto;
+    display: block;
+    width: 50%;
+    --border-radius: 25px; 
+    margin-top: 30%;
+}
+
+a{
+    color: #062f77;
+}
+
+img{
+    height: 60vh;
+    width: auto;
+    margin: auto;
+    display: block;
+  }
+
+ion-content {
+    --background: url('/assets/img/wallpaper.png')  0 0/100% 100%;
+     background-size: cover;
+}
+
+.center {
+    text-align: center;
+}
+
+.scroll-content {
+    margin-bottom: 0!important;
+  }
+
+ion-card {
+    background-color: rgb(255, 255, 255); // black
+    border-radius: 40px;
+    height: auto;
+    margin-top: 15%;
+  }
+

@@ -1,37 +1,49 @@
-<ion-content style="--background:whitesmoke">
-  <div> 
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-      <path fill="#bf2025" fill-opacity="1"
-        d="M0,64L48,90.7C96,117,192,171,288,181.3C384,192,480,160,576,160C672,160,768,192,864,218.7C960,245,1056,267,1152,266.7C1248,267,1344,245,1392,234.7L1440,224L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z">
-      </path>
-    </svg>
-  </div>
-  <div style="width:70%;margin:auto;margin-bottom: 50px;">
-    <img src="assets/img/logo.png">
-  </div>
-  <ion-card  class="ion-text-center" style="box-shadow: #26394d 0px 20px 30px -10px;">
-    <ion-card-header class="ion-text-start ion-margin">
-      <ion-card-title>Welcome ,</ion-card-title>
-      <ion-card-subtitle>Please enter your credentials</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <mat-form-field style="width:100%;" appearance="outline">
-        <mat-icon matPrefix>email</mat-icon>
-        <mat-label>Email / Username</mat-label>
-        <input matInput>
-      </mat-form-field>
-      <mat-form-field style="width:100%;" appearance="outline">
-        <mat-icon matPrefix>lock</mat-icon>
-        <mat-label>Password</mat-label>
-        <input matInput>
-      </mat-form-field>
-      <button  mat-flat-button style="border-radius: 40px;width:70%;height:50px;margin-top: 100px;background: #bf2025;color: white;font-weight: bold;">Login</button>
+<ion-content  padding class="background">
+  <form #form="ngForm">
+    <ion-grid>
+      <ion-row color="primary">
+        <ion-col>
+          <div padding>
+            <ion-img style="width: 70%; height: auto; margin-top: 25px; display: block;margin: auto;" src="../../assets/img/logo_sr.png"
+                padding>
+            </ion-img>
+          </div> 
+          <ion-card>
+            <ion-item class="backinput" style="margin-top: 16%;">
+              <ion-img src="../../assets/icon/email25.png"></ion-img> 
+              <ion-input style="--padding-start:10px;" name="email" type="email" placeholder="Email" padding="10" [(ngModel)]="inputEmail">
+              </ion-input>
+            </ion-item>
 
-    </ion-card-content>
-  </ion-card>
-  <svg style="position: absolute;bottom:0px"xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-    <path fill="#bf2025" fill-opacity="1"
-      d="M0,64L48,90.7C96,117,192,171,288,181.3C384,192,480,160,576,160C672,160,768,192,864,218.7C960,245,1056,267,1152,266.7C1248,267,1344,245,1392,234.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
-    </path>
-  </svg>
+            <ion-item class="backinput" style="margin-top: 15%">
+              <ion-img src="../../assets/icon/pass25.png"></ion-img>
+              <ion-input style="--padding-start:10px;" name="password" type="password" placeholder="Password" padding="10" [(ngModel)]="inputPass"></ion-input>
+            </ion-item>
+
+            <ion-item lines="none" class="checkbox" style="padding-left: 4%">
+              <ion-checkbox checked={{remembercheck}} ([ngModel])="remembercheck" (ionChange)="rememberme($event)" ></ion-checkbox>
+              <ion-label style="padding-left: 2%;">Remember me</ion-label>
+            </ion-item>
+            
+            <div>
+              <ion-button size="large" type="submit" [disabled]="form.invalid" expand="block" (click) = "presentAlert(inputEmail,inputPass)">Login</ion-button>
+            </div>
+            
+            <div  text-center (click)="forgetPass()" style="text-align: center;margin: 5% 0% 5% 0%;">
+            <ion-label>
+                Forget Password
+            </ion-label>
+            </div>
+          </ion-card>
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>
+
+<ion-footer no-border transparent class="ion-text-center">
+
+        <ion-text style="color: black; font-size: 0.6rem " >Copyright &copy; by Qube Apps Solutions Sdn Bhd</ion-text>
+
+</ion-footer>

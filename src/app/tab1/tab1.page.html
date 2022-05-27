@@ -1,115 +1,331 @@
-
-
 <ion-content [fullscreen]="true" style="--background: linear-gradient( 65.9deg,  rgb(231, 255, 254) 5.5%, rgb(237, 237, 255) 54.2%, rgb(236, 250, 255) 55.2%, rgb(251, 240, 255) 98.4% );">
- 
-  <ion-header class="ion-no-border">
-    <ion-toolbar style="--background:transparent;padding:15px">
-      <ion-title style="font-size: 20px;"> 
-        Sales Report
-      </ion-title>
-      <div slot="end">
-        <mat-date-range-input [rangePicker]="picker" [hidden]="true">
-        <input matStartDate placeholder="Start date">
-        <input matEndDate placeholder="End date">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-date-range-picker #picker></mat-date-range-picker>
-    </div>
-  
-    </ion-toolbar>
-  </ion-header>
-   <ion-card style="max-height: 80px;">
-    <ion-label>
-      <p>TOTOL SALES</p>
-      <h1 style="color:black;font-weight:bold">RM 999,999,999</h1>
-    </ion-label>
-    <ion-badge style="position:absolute;right:10px;bottom:10px;background: green;">
-      <ion-icon name="caret-up-outline"></ion-icon>
-      <ion-label>5%</ion-label>
-    </ion-badge>
-  </ion-card>
-  <ion-card style="max-height: 80px;">
-    <ion-label>
-      <p>TOTAL TRANSACTION</p>
-      <h1 style="color:black;font-weight:bold">999,999,999</h1>
-    </ion-label>
-    <ion-badge style="position:absolute;right:10px;bottom:10px;background: red;">
-      <ion-icon name="caret-down-outline"></ion-icon>
-      <ion-label>-5%</ion-label>
-    </ion-badge>
-  </ion-card>
-<ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
-  <div id="chart">
-    <apx-chart
-      [series]="chartOptions.series"
-      [chart]="chartOptions.chart"
-      [xaxis]="chartOptions.xaxis"
-      [stroke]="chartOptions.stroke"
-      [tooltip]="chartOptions.tooltip"
-      [dataLabels]="chartOptions.dataLabels"
-    ></apx-chart>
-  </div>
-</ion-card>
-<ion-grid>
-  <ion-row >
-    <ion-col size="6">
-      <ion-card style="background-image: linear-gradient( 135deg, #81FBB8 10%, #28C76F 100%);">
-        <ion-label>
-          <p style="font-size:0.7rem;margin: 0px;">Daily Top Outlet</p>
-          <h1 style="font-size: 1.3rem;margin: 0px;color:black">RM 999,999.00</h1>
-          <ion-note style="color:black">
-            AAA Outlet
-          </ion-note>
-        </ion-label>
-      </ion-card>
-    </ion-col>
-    <ion-col size="6">
-      <ion-card style="background-image: linear-gradient( 135deg, #FEC163 10%, #DE4313 100%);">
-        <ion-label>
-          <p style="font-size:0.7rem;margin: 0px;">Daily Top Sku</p>
-          <h1 style="font-size: 1.3rem;margin: 0px;color:black">RM 999,999.00</h1>
-          <ion-note style="color:black">
-            Product 1
-          </ion-note>
-        </ion-label>
-      </ion-card>
-    </ion-col>
-    <ion-col size="6">
-      <ion-card style="background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);">
-        <ion-label>
-          <p style="font-size:0.7rem;margin: 0px;">Daily Top Dept</p>
-          <h1 style="font-size: 1.3rem;margin: 0px;color:black">RM 999,999.00</h1>
-          <ion-note style="color:black">
-            Food
-          </ion-note>
-        </ion-label>
-      </ion-card>
-    </ion-col>
-    <ion-col size="6">
-      <ion-card style="background-image: linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%);">
-        <ion-label>
-          <p style="font-size:0.7rem;margin: 0px;">Daily Top Hour</p>
-          <h1 style="font-size: 1.3rem;margin: 0px;color:black">RM 999,999.00</h1>
-          <ion-note style="color:black">
-            12
-          </ion-note>
-        </ion-label>
-      </ion-card>
-    </ion-col>
-  </ion-row>
- 
 
-</ion-grid>
-<ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
-  <div id="chart">
-    <apx-chart
-      [series]="chartOptions.series"
-      [chart]="chartOptions.chart"
-      [xaxis]="chartOptions.xaxis"
-      [stroke]="chartOptions.stroke"
-      [tooltip]="chartOptions.tooltip"
-      [dataLabels]="chartOptions.dataLabels"
-    ></apx-chart>
-  </div>
+<!-- HEADER -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="secondary">
+      <ion-button (click)="showSetOutlet()">
+        <ion-img src="assets/icon/outlet.png"></ion-img>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      SALES DASHBOARD
+    </ion-title>
+    <div slot="end" >
+      <mat-date-range-input [rangePicker]="picker" [hidden]="true">
+        <input [(ngModel)]="startTime" matStartDate placeholder="Start date">
+        <input [(ngModel)]="endTime" matEndDate placeholder="End date" (click)="changeDate()">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker">
+      </mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+      </mat-date-range-picker>
+    </div>
+
+  </ion-toolbar>
+</ion-header>
+
+<!-- SELECT STORE -->
+<ion-card *ngIf="outlethide" [@fadeInOut] style="width: 100% !important;margin: 0 !important;padding: 0 !important;height: auto;">
+  <ion-card-content>
+    <div class="scroll" scrollY="true" style="max-height: 500px;">
+      <ion-list>
+        <ion-radio-group>
+          <ion-list-header>
+            <ion-label>Select Store : </ion-label>
+          </ion-list-header>
+          <ion-item *ngFor="let oi of outlet;let i = index">
+            <ion-label>{{oi.name}}</ion-label>
+            <ion-checkbox [checked]="oi.isCheck" (ionChange)="selectOutlet(oi,i,$event)">
+            </ion-checkbox>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </div>
+    <ion-button color="success" expand="full" type="submit" (click)="changeOutlet()">DONE</ion-button>
+  </ion-card-content>
+  
 </ion-card>
+
+<!-- SELECT DATE -->
+<ion-card *ngIf="datehide" [@fadeInOut] style="width: 100% !important;margin: 0 !important;padding: 0 !important;height: auto;">
+  <ion-card-content>
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Select Date : </ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-icon name="calendar"></ion-icon>
+        <ion-label>FROM</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY" [max]="toDate" [(ngModel)]="startTime"></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="calendar"></ion-icon>
+        <ion-label>TO</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY" [max]="toDate" [(ngModel)]="endTime"></ion-datetime>
+      </ion-item>
+      <!-- <ion-grid> -->
+      <!-- <ion-row>
+            <ion-col col-6>
+              <ion-button color="danger" expand="full" type="submit" (click)="cancelDate()">CANCEL</ion-button>
+            </ion-col>
+            <ion-col col-6> -->
+      <ion-button color="success" expand="full" type="submit" (click)="changeDate()">DONE</ion-button>
+      <!-- </ion-col>
+          </ion-row> -->
+      <!-- </ion-grid> -->
+    </ion-list>
+  </ion-card-content>
+</ion-card>
+
+<!-- CONTENT -->
+  <!-- <div class="chart-container">
+    <div class="btndate">
+      <ion-label size="small" style="margin-left:2%;">Daily</ion-label>
+      <ion-label size="small" style="margin-left:2%;">Weekly</ion-label>
+      <ion-label size="small" style="margin-left:2%;">Monthly</ion-label>
+    </div>
+      <canvas #barCanvas></canvas>
+    </div> -->
+
+  <div class="cardmiddleposition">
+    <ion-card class="totalsalescard" (click)="goSalesPage()">
+      <ion-card-header style="padding-bottom: 0px;margin-top:-10px;">
+        DAILY TOTAL SALES
+      </ion-card-header>
+      <ion-card-content  style="text-align: center;">
+        <ion-label class="my-label">{{totalSales}} <ion-icon style="float: right;" name="ios-cash"></ion-icon></ion-label>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="trxcard">
+      <ion-card-header  style="padding-bottom: 0px;margin-top:-10px;">
+        DAILY TOTAL TRANSACTION
+      </ion-card-header>
+      <ion-card-content  style="text-align: center;">
+        <ion-label class="my-label">{{totalTrx}}<ion-icon style="float: right;" name="md-contacts"></ion-icon></ion-label>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
+      <div id="chart">
+        <apx-chart
+          [series]="chartOptions.series"
+          [chart]="chartOptions.chart"
+          [xaxis]="chartOptions.xaxis"
+          [stroke]="chartOptions.stroke"
+          [tooltip]="chartOptions.tooltip"
+          [dataLabels]="chartOptions.dataLabels"
+        ></apx-chart>
+      </div>
+    </ion-card>
+  
+    
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="salescard" (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px; font-size: 13px;">
+              DAILY TOP OUTLET
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{largest}}</ion-label>
+              <ion-label style="font-size: 13px;" class="my-label3">{{store}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="deptcard" (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
+              DAILY TOP DEPT
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{largetdept}}</ion-label>
+              <ion-label style="font-size: 13px;" class="my-label3">{{deptstore}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="skucard" (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
+              DAILY TOP SKU
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{largetsku}}</ion-label>
+              <ion-label style="font-size: 13px;" class="my-label3">{{skustore}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="hourcard" (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
+              DAILY TOP HOURLY
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{hourcode}}</ion-label>
+              <ion-label style="font-size: 13px;opacity: 0;" class="my-label3">0</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row> 
+    </ion-grid>
+
+    <!-- <ion-col size="6">
+          <ion-card (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px">
+              {{titlesku}}
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{topSku}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-card (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px">
+              {{titledept}}
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{topDept}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card (click)="onButtonTitleClicked($event, reportType)">
+            <ion-card-header style="padding-bottom: 0px">
+              {{titlehour}}
+            </ion-card-header>
+            <ion-card-content  style="padding: 10px">
+              <ion-label class="my-label2">{{topHour}}</ion-label>
+            </ion-card-content>
+          </ion-card>
+        </ion-col> -->
+
+    <!-- <ion-grid>
+      <ion-row style="margin-top:-20px" >
+        <ion-col size="6" >
+          <ion-card style="background-image: linear-gradient( 135deg, #81FBB8 10%, #28C76F 100%);">
+            <ion-label>
+              <p style="font-size:0.7rem;margin: 0px;">Daily Top Outlet</p>
+              <h1 style="font-size: 1.3rem;margin: 0px;color:black">{{largest}}</h1>
+              <ion-note style="color:black">
+                {{store}}
+              </ion-note>
+            </ion-label>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card style="background-image: linear-gradient( 135deg, #FEC163 10%, #DE4313 100%);">
+            <ion-label>
+              <p style="font-size:0.7rem;margin: 0px;">Daily Top Sku</p>
+              <h1 style="font-size: 1.3rem;margin: 0px;color:black">RM 0</h1>
+              <ion-note style="color:black">
+                Product 1
+              </ion-note>
+            </ion-label>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card style="background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);">
+            <ion-label>
+              <p style="font-size:0.7rem;margin: 0px;">Daily Top Dept</p>
+              <h1 style="font-size: 1.3rem;margin: 0px;color:black">{{largetdept}}</h1>
+              <ion-note style="color:black">
+                {{deptstore}}
+              </ion-note>
+            </ion-label>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card style="background-image: linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%);">
+            <ion-label>
+              <p style="font-size:0.7rem;margin: 0px;">Daily Top Hour</p>
+              <h1 style="font-size: 1.3rem;margin: 0px;color:black">{{hourcode}}</h1>
+              <ion-note style="opacity:0">
+                null
+              </ion-note>
+            </ion-label>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid> -->
+
+    <!-- <div class="btndate-btm">
+      <ion-button style="margin-left:2%;">Daily</ion-button>
+      <ion-button style="margin-left:2%;">Weekly</ion-button>
+      <ion-button style="margin-left:2%;">Monthly</ion-button>
+    </div>
+
+    <div class="listtitle"> -->
+      <!-- <ion-grid>
+        <ion-row>
+          <ion-col style="align-self: center;" size="1">Top</ion-col>
+          <ion-col size="1.5"><ion-input class="listinput" type="tel" maxlength="3"></ion-input></ion-col>
+          <ion-col style="align-self: center;" size="3.5">{{title}}</ion-col>
+          <ion-col size="5.5">      
+            <ion-button (click)="showSetDate()" style="float: right;" >
+            <ion-img src="assets/icon/calendar.png"></ion-img>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid> -->
+   
+<!-- 
+      <ion-list>
+        <ion-item>
+          <ion-label>abc</ion-label>
+        </ion-item>
+      </ion-list>
+  </div> -->
+  
+    <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
+      <div id="chart">
+        <apx-chart
+          [series]="chartOptions.series"
+          [chart]="chartOptions.chart"
+          [xaxis]="chartOptions.xaxis"
+          [stroke]="chartOptions.stroke"
+          [tooltip]="chartOptions.tooltip"
+          [dataLabels]="chartOptions.dataLabels"
+        ></apx-chart>
+      </div>
+    </ion-card>
+    <!-- <ion-card>
+      <ion-card-header>
+        Bar Chart
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #barCanvas></canvas>
+      </ion-card-content>
+    </ion-card> -->
+
+    <!-- <ion-card>
+      <ion-card-header>
+        Doughnut Chart
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #doughnutCanvas></canvas>
+      </ion-card-content>
+    </ion-card> -->
+
+    <!-- <div class="chart-container">
+      <canvas #doughnutCanvas></canvas>
+    </div> -->
+    
+    <!-- <ion-card>
+      <ion-card-header>
+        Line Chart
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #lineCanvas></canvas>
+      </ion-card-content>
+    </ion-card> -->
+  </div>
 </ion-content>
