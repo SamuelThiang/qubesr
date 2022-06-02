@@ -6,6 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import 'rxjs/add/operator/timeout';
 import {DatePipe} from '@angular/common';
+import {FormControl} from '@angular/forms';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -16,6 +17,33 @@ import {
   ApexStroke
 } from "ng-apexcharts";
 import { concat } from "rxjs";
+import {
+  MomentDateAdapter,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+} from '@angular/material-moment-adapter';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+} from '@angular/material/core';
+import { MatDatepicker } from '@angular/material/datepicker';
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupMoment, Moment } from 'moment';
+
+const moment = _rollupMoment || _moment;
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -40,23 +68,43 @@ export type ChartOptions = {
         animate(500, style({ opacity: 0 }))
       ])
     ])
+  ],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+    },
+
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ]
 })
+
 export class Tab1Page implements OnInit{
 
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
+  
   alertCtrl: any;
   loading: any;
+  getstartdate: string;
   startTime: string = new Date().toISOString()
   endTime: string = new Date().toISOString()
   datehide: boolean = false;
   outlethide: boolean = false;
+  TopOutletclicked: boolean =true;
+  TopDeptclicked:boolean = false;
+  TopSKUclicked:boolean =false;
+  TopHourclicked:boolean =false;
+  TopWeeklyDeptClicked :boolean =false;
   reportType = [];
   storeoutlet = [];
   storepath=[];
+  showall =[];
+  showallsku =[];
+  showallDept =[];
+  showtotal =[];
   outlet = [];
-  showall = [];
   //topoutlet
   largest = "RM 0";
   store = "";
@@ -73,6 +121,7 @@ export class Tab1Page implements OnInit{
   largetsku = "RM 0";
   skustore="";
 
+  autocount = 0;
   dataB: any;
   selectedOutlet = [];
   reportTypeSelect: string = "SALES";
@@ -87,8 +136,10 @@ export class Tab1Page implements OnInit{
   dd = this.d.getDate();
   mm = this.d.getMonth() + 1;
   yy = this.d.getFullYear();
-  date = this.yy + '-' + this.mm + '-' + this.dd;
-  toDate = this.datePipe.transform(this.date,"yyyy-MM-dd");
+  monthStartConvert : string;
+  monthEndConvert : string;
+  //date = this.yy + '-' + this.mm + '-' + this.dd;
+  //toDate = this.datePipe.transform(this.date,"yyyy-MM-dd");
 
   constructor(    
     public loadingController: LoadingController,
@@ -100,62 +151,93 @@ export class Tab1Page implements OnInit{
     private navCtrl: NavController) 
     
     {
-    this.chartOptions = {
-      series: [
-        {
-          name: "series1",
-          data: [31, 40, 28, 51, 42, 109, 100]
+      this.chartOptions = {
+        series: [
+          {
+            name: "series1",
+            data: [31, 40, 28, 51, 42, 109, 100]
+          },
+          {
+            name: "series2",
+            data: [11, 32, 45, 32, 34, 52, 41]
+          }
+        ],
+        chart: {
+          height: 350,
+          type: "area"
         },
-        {
-          name: "series2",
-          data: [11, 32, 45, 32, 34, 52, 41]
-        }
-      ],
-      chart: {
-        toolbar: {
-          show:false
+        dataLabels: {
+          enabled: false
         },
-        height: 250,
-        type: "area"
-    
-      },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        curve: "smooth"
-      },
-      xaxis: {
-        type: "datetime",
-        categories: [
-          "2018-09-19T00:00:00.000Z",
-          "2018-09-19T01:30:00.000Z",
-          "2018-09-19T02:30:00.000Z",
-          "2018-09-19T03:30:00.000Z",
-          "2018-09-19T04:30:00.000Z",
-          "2018-09-19T05:30:00.000Z",
-          "2018-09-19T06:30:00.000Z"
-        ]
-      },
-      tooltip: {
-        x: {
-          format: "dd/MM/yy HH:mm"
+        stroke: {
+          curve: "smooth"
+        },
+        xaxis: {
+          type: "datetime",
+          categories: [
+            "2018-09-19T00:00:00.000Z",
+            "2018-09-19T01:30:00.000Z",
+            "2018-09-19T02:30:00.000Z",
+            "2018-09-19T03:30:00.000Z",
+            "2018-09-19T04:30:00.000Z",
+            "2018-09-19T05:30:00.000Z",
+            "2018-09-19T06:30:00.000Z"
+          ]
+        },
+        tooltip: {
+          x: {
+            format: "dd/MM/yy HH:mm"
+          }
         }
-      }
-    };
-  }
+      };
+    }
   
   ngOnInit() {
     this.getReportType();
     this.getstorelist();
     this.getTodayReport();
+    this.getWeeklyData();
+    
   }
 
-  gettoplist(res)
-  {
-    this.showall = [];
-    //console.log("gettoplist",res)
+  date = new FormControl(moment());
 
+  chosenYearHandler(normalizedYear: Moment) {
+    const ctrlValue = this.date.value;
+    ctrlValue.year(normalizedYear.year());
+    this.date.setValue(ctrlValue);
+  }
+
+  chosenMonthHandler(
+    normalizedMonth: Moment,
+    datepicker: MatDatepicker<Moment>
+  ) {
+    var ctrlValue = this.date.value;
+    ctrlValue.month(normalizedMonth.month());
+    this.date.setValue(ctrlValue);
+    datepicker.close();
+
+    this.monthStartConvert = this.datePipe.transform(ctrlValue, 'yyMM01');
+    var monthend = ctrlValue.endOf('month');
+    
+    this.monthEndConvert = this.datePipe.transform(monthend, 'yyMMdd'); 
+
+    if(this.TopOutletclicked == true)
+    {
+      this.getsalesoutletMonthly()
+    }
+    else if(this.TopDeptclicked == true)
+    {
+      this.getdeptMonthly();
+    }
+    else if(this.TopSKUclicked == true)
+    {
+      this.getSKUMonthly();
+    }
+    else if(this.TopHourclicked == true)
+    {
+      this.gethouroutletWeekly();
+    }
   }
 
   getReportType(){
@@ -165,30 +247,9 @@ export class Tab1Page implements OnInit{
     console.log(this.reportType)
   }
 
-  getColor()
-  {
-    const color = this.getRandomColor();
-    return {
-      'background-color':color
-    }
-  }
-
-  getRandomColor()
-  {
-    var trans = '0.5'; // 50% transparency
-     var color = 'rgba(';
-     for (var i = 0; i < 3; i++) {
-       color += Math.floor(Math.random() * 255) + ',';
-      }
-     color += trans + ')'; // add the transparency
-      return color;
-  }
-
   selectOutlet(outlet, index, event) {
     //console.log(event.target.checked);
-    
     this.outlet[index].isCheck = event.target.checked;
-    
   }
 
   returnDate(oldDate) {
@@ -205,53 +266,68 @@ export class Tab1Page implements OnInit{
 
   changeDate()
   {
-    console.log('Received Report From Start Date : ' + this.returnDate(this.startTime) + ' End Date : ' + this.returnDate(this.endTime));
+    //console.log('Received Report From Start Date : ' + this.returnDate(this.startTime) + ' End Date : ' + this.returnDate(this.endTime));
     //this.getAllreport();
     this.datehide = !this.datehide;
   }
 
-  changeOutlet() {
+  changeOutlet() { 
     var storepath ="";
       this.storeoutlet = this.outlet.filter((result)=>{
         return result.isCheck == true
       });
-      console.log(this.storeoutlet);
+      //console.log(this.storeoutlet);
       storepath = storepath + ',' + this.storeoutlet.map(x=>{
         return x.value;
       });
       var resOutlet = storepath.substring(1);
       console.log(resOutlet);
-      // this.outlethide =!this.outlethide;
-      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'SALES' , resOutlet);
+      this.outlethide =!this.outlethide;
+      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'SALES' , resOutlet).then((res:any)=>{
+        this.findTopOutlet(res);
+        this.sumTotal(res);
+        this.sumTotaltrx(res);
+      })
+      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'DEPARTMENT', resOutlet).then((res:any)=>{
+        this.findTopdept(res);
+      }) 
+      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'SKU', resOutlet).then((res:any)=>{
+          this.findTopsku(res);
+      })
+      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'HOURLY' , resOutlet).then((res:any)=>{
+            this.findTopHour(res);
+      })
+
   }
 
   getTodayReport()
   {
-    this.getsalesoutlet()
-    
-    this.gethouroutlet()
-
-    this.getSKU()
-
-    this.getdept()  
+    this.getsalesoutlet();
+    this.gethouroutlet();
+    this.getSKU();
+    this.getdept();
   }
 
   getdept()
   {
-    let storepath = '';
-    storepath = storepath + ',' + this.outlet.map(x=>{
-    return x.value;
-    });
-    var resOutlet = storepath.substring(1);
-    this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'DEPARTMENT', resOutlet).then((res:any)=>{
-    // console.log(res)
-    this.findTopdept(res);
-    })
+      let storepath = '';
+      this.storeoutlet = this.outlet.filter((result)=>{
+        return result.isCheck == true
+      });
+      storepath = storepath + ',' + this.outlet.map(x=>{
+      return x.value;
+      });
+      var resOutlet = storepath.substring(1);
+
+      this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime),'DEPARTMENT', resOutlet).then((res:any)=>{
+      // get daily top dept
+      this.findTopdept(res);
+      }) 
   }
 
   findTopdept(res)
   {
-    console.log(res);
+    //Calculate Total
     var totals = res.reduce((c,x)=>
     {
       if(!c[x.Code]) c[x.Code] = {
@@ -263,29 +339,100 @@ export class Tab1Page implements OnInit{
       return c;
     }, {});
   
-    //var largest = 0;
+    //get department Array List
     var number = null;
     let testnumber =0;
-    for (var i in totals) {
+    for (var i in totals) 
+    {
       const tmplar = testnumber;
-      // Update current number 
-        number = totals[i].Total;
-      // Compares stored largest number with current number, stores the largest one
+      number = totals[i].Total;
+
+      //calculate Top 1 Record
       testnumber = Math.max(testnumber, number);
-        if(testnumber !== tmplar){
+        if(testnumber !== tmplar)
+        {
             this.deptstore =  totals[i].Desc;
         }
          var t = (Math.round(testnumber * 100) / 100).toFixed(2);
-         
-      }
-      console.log("abc",t);
-      this.largetdept = ("RM " + t.toString());
-     //console.log(this.largetdept,this.deptstore)    
+    }
+
+    this.largetdept = ("RM " + t.toString());
+  
+    //convert object to array and sort array
+    var toarr = Object.values(totals);
+    toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+
+    //top10result
+    this.showallDept = []
+    this.showallDept = toarr;
+    //console.log("check",this.showallDept)
+  }
+
+  getdeptWeekly()
+  {
+      let [start, end] = this.getWeeklyData();
+      this.storeoutlet = this.outlet.filter((result)=>{
+        return result.isCheck == true
+      });
+      let storepath = '';
+      storepath = storepath + ',' + this.outlet.map(x=>{
+      return x.value;
+      });
+      var resOutlet = storepath.substring(1);
+
+      this.getReport(this.returnDate(start), this.returnDate(end),'DEPARTMENT', resOutlet).then((res:any)=>{
+      // get daily top dept
+      this.findTopdeptWeekly(res);
+      }) 
+  }
+
+  findTopdeptWeekly(res)
+  {
+    //Calculate Total
+    var totals = res.reduce((c,x)=>
+    {
+      if(!c[x.Code]) c[x.Code] = {
+          Desc: x.Desc,
+          Code: x.Code, 
+          Total: 0
+      };
+      c[x.Code].Total += Number(x.Net);
+      return c;
+    }, {});
+  
+    //convert object to array and sort array
+    var toarr = Object.values(totals);
+    toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+
+    //top10result
+    this.showallDept = []
+    this.showallDept = toarr;
+    //console.log("check",this.showallDept)
+  }
+
+  getdeptMonthly()
+  {
+      this.storeoutlet = this.outlet.filter((result)=>{
+        return result.isCheck == true
+      });
+      let storepath = '';
+      storepath = storepath + ',' + this.outlet.map(x=>{
+      return x.value;
+      });
+      var resOutlet = storepath.substring(1);
+
+      this.getReport(this.monthStartConvert, this.monthEndConvert,'DEPARTMENT', resOutlet).then((res:any)=>{
+      // get daily top dept
+      this.findTopdeptWeekly(res);
+      }) 
   }
 
   getSKU()
   {    
     let storepath = '';
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
     storepath = storepath + ',' + this.outlet.map(x=>{
     return x.value;
     });
@@ -298,7 +445,7 @@ export class Tab1Page implements OnInit{
 
   findTopsku(res)
   {
-    console.log(res);
+    //console.log(res);
     var totals = res.reduce((c,x)=>
     {
       if(!c[x.Code]) c[x.Code] = {
@@ -310,14 +457,11 @@ export class Tab1Page implements OnInit{
       return c;
     }, {});
   
-    //var largest = 0;
     var number = null;
     let testnumber =0;
     for (var i in totals) {
       const tmplar = testnumber;
-      // Update current number 
         number = totals[i].Total;
-      // Compares stored largest number with current number, stores the largest one
       testnumber = Math.max(testnumber, number);
         if(testnumber !== tmplar){
             this.skustore =  totals[i].Desc;
@@ -325,29 +469,38 @@ export class Tab1Page implements OnInit{
          var t = (Math.round(testnumber * 100) / 100).toFixed(2);
          
       }
-      console.log("abc",t);
+      //console.log("abc",t);
       this.largetsku = ("RM " + t.toString());
-     console.log(this.largetsku,this.skustore) 
+     //console.log(this.largetsku,this.skustore) 
+
+     //convert to array
+     var toarr = Object.values(totals);
+      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.showallsku = []
+     this.showallsku = toarr;
+
   }
-  
-  getsalesoutlet()
-  {
+
+  getSKUWeekly()
+  {    
+    let [start, end] = this.getWeeklyData();
     let storepath = '';
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
     storepath = storepath + ',' + this.outlet.map(x=>{
-      return x.value;
+    return x.value;
     });
     var resOutlet = storepath.substring(1);
-    this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime), 'SALES' , resOutlet).then((res:any)=>{
-      this.findTopOutlet(res);
-      this.gettoplist(res)
-      this.sumTotal(res);
-      this.sumTotaltrx(res);
+    this.getReport(this.returnDate(start), this.returnDate(end),'SKU', resOutlet).then((res:any)=>{
+    // console.log(res)
+    this.findTopskuWeekly(res);
     })
   }
 
-  findTopOutlet(res)
+  findTopskuWeekly(res)
   {
-    console.log(res);
+    //console.log(res);
     var totals = res.reduce((c,x)=>
     {
       if(!c[x.Code]) c[x.Code] = {
@@ -358,35 +511,153 @@ export class Tab1Page implements OnInit{
       c[x.Code].Total += Number(x.Net);
       return c;
     }, {});
+
+     //convert to array
+     var toarr = Object.values(totals);
+      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.showallsku = []
+     this.showallsku = toarr;
+     console.log("check",this.showallsku)
+      // console.log("str",this.showtotal)
+  }
+
+  getSKUMonthly()
+  {    
+    let storepath = '';
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    storepath = storepath + ',' + this.outlet.map(x=>{
+    return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    this.getReport(this.monthStartConvert, this.monthEndConvert,'SKU', resOutlet).then((res:any)=>{
+    // console.log(res)
+    this.findTopskuWeekly(res);
+    })
+  }
+  
+  getsalesoutlet()
+  {
+    var storepath ="";
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
     
-    //var largest = 0;
+    storepath = storepath + ',' + this.outlet.map(x=>{
+      return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    
+    this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime), 'SALES' , resOutlet).then((res:any)=>{
+      this.findTopOutlet(res);
+      this.sumTotal(res);
+      this.sumTotaltrx(res);
+    })
+  }
+
+  findTopOutlet(res)
+  {
+    var totals = res.reduce((c,x)=>
+    {
+      if(!c[x.Code]) c[x.Code] = {
+          Desc: x.Desc,
+          Code: x.Code, 
+          Total: 0
+      };
+      c[x.Code].Total += Number(x.Net);
+      return c;
+    }, {});
+  
     var number = null;
-    let testnumber = 0;
-    
+    let testnumber =0;
     for (var i in totals) {
       const tmplar = testnumber;
-      // Update current number 
         number = totals[i].Total;
-      // Compares stored largest number with current number, stores the largest one
-        testnumber = Math.max(testnumber, number);
+      testnumber = Math.max(testnumber, number);
         if(testnumber !== tmplar){
             this.store =  totals[i].Desc;
         }
-        var t = (Math.round(testnumber * 100) / 100).toFixed(2);
-       
+         var t = (Math.round(testnumber * 100) / 100).toFixed(2);
+         
       }
-     //console.log("console total",totals)
-     this.largest = ("RM " + t.toString());
+      //console.log("abc",t);
+      this.largest = ("RM " + t.toString());
+     //console.log(this.largetsku,this.skustore) 
 
+     //convert to array
      var toarr = Object.values(totals);
-     //var sort = sort.sortBy(toarr,["Total","Desc"]);
-     console.log("toarr",toarr)
+      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.showallsku = []
+     this.showallsku = toarr;
+  }
+
+  getsalesoutletweekly()
+  {
+      let [start, end] = this.getWeeklyData();
+      let storepath = '';
+      console.log("check start",start)
+      this.storeoutlet = this.outlet.filter((result)=>{
+        return result.isCheck == true
+      });
+      storepath = storepath + ',' + this.storeoutlet.map(x=>{
+        return x.value;
+      });
+      var resOutlet = storepath.substring(1);
+      console.log("check return",this.returnDate(start))
+      this.getReport(this.returnDate(start), this.returnDate(end), 'SALES' , resOutlet).then((res:any)=>{
+        this.findTopOutletWeekly(res);
+      })
+  }
+
+  findTopOutletWeekly(res)
+  {
+    //console.log(res);
+    var totals = res.reduce((c,x)=>
+    {
+      if(!c[x.Code]) c[x.Code] = {
+          Desc: x.Desc,
+          Code: x.Code, 
+          Total: 0
+      };
+      c[x.Code].Total += Number(x.Net);
+      return c;
+    }, {});
+
+     //convert to array
+     var toarr = Object.values(totals);
+     toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+
+     this.showall = []
+     this.showall= toarr;
+     //console.log("checkoutlet",this.showall)
+  }
+
+  getsalesoutletMonthly()
+  {
+    var storepath ="";
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
+      return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    console.log("montconsaleshere",this.monthStartConvert)
+    console.log("montconsaleshere",this.monthEndConvert)
+    this.getReport(this.monthStartConvert, this.monthEndConvert, 'SALES' , resOutlet).then((res:any)=>{
+      this.findTopOutletWeekly(res);
+    })
   }
 
   gethouroutlet()
   {
     let storepath = '';
-    storepath = storepath + ',' + this.outlet.map(x=>{
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
       return x.value;
     });
     var resOutlet = storepath.substring(1);
@@ -424,6 +695,52 @@ export class Tab1Page implements OnInit{
         }
       }
       //console.log(this.largesthour,this.hourcode)
+      var toarr = Object.values(totalshour);
+      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+ 
+      this.showall = []
+      this.showall= toarr;
+      //console.log("check hour",this.showall)
+      //console.log("checkoutlet",this.showall)
+  }
+
+  gethouroutletWeekly()
+  {
+    let [start, end] = this.getWeeklyData();
+    let storepath = '';
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
+      return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    this.getReport(this.returnDate(start), this.returnDate(end),'HOURLY' , resOutlet).then((res:any)=>{
+      //console.log(res)
+      this.findTopHourWeekly(res);
+    })
+  }
+
+  findTopHourWeekly(res)
+  {    
+    //console.log(res);
+    var totalshour = res.reduce((c,x)=>
+    {
+      if(!c[x.Code]) c[x.Code] = {
+          Code: x.Code, 
+          Total: 0
+      };
+      c[x.Code].Total += Number(x.Net);
+      return c;
+    }, {});
+
+    //convert to array
+     var toarr = Object.values(totalshour);
+     toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+
+     this.showall = []
+     this.showall= toarr;
+     console.log("checkoutlet",this.showall)
   }
 
   showSetDate() {
@@ -438,6 +755,52 @@ export class Tab1Page implements OnInit{
       this.datehide = !this.datehide;
     }
     this.outlethide = !this.outlethide;
+  }
+
+  HideTopOutlet()
+  {
+    if(this.TopDeptclicked === false || this.TopHourclicked === false|| this.TopSKUclicked === false)
+    {
+      this.TopDeptclicked =false;
+      this.TopSKUclicked =false;
+      this.TopOutletclicked = true;
+      this.TopHourclicked = false;
+    }
+  }
+
+  HideTopDept()
+  {
+    
+    if(this.TopOutletclicked === true || this.TopHourclicked === true|| this.TopSKUclicked === true)
+    {
+      this.TopDeptclicked =true;
+      this.TopSKUclicked =false;
+      this.TopOutletclicked = false;
+      this.TopHourclicked = false;
+    }
+    
+  }
+
+  HideTopSKU()
+  {
+    if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopHourclicked === true)
+    {
+      this.TopDeptclicked =false;
+      this.TopSKUclicked =true;
+      this.TopOutletclicked = false;
+      this.TopHourclicked = false;
+    }
+  }
+
+  HideTopHour()
+  {
+    if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopSKUclicked === true)
+    {
+      this.TopDeptclicked =false;
+      this.TopSKUclicked =false;
+      this.TopOutletclicked = false;
+      this.TopHourclicked = true;
+    }
   }
 
   getstorelist()
@@ -479,7 +842,7 @@ export class Tab1Page implements OnInit{
       })
     };
 
-    return this.http.post('https://qubelive.com.my/QubeSR/User/salereportAll.php', postData.toString(), httpOptions).timeout(10000).toPromise();
+    return this.http.post('https://qubelive.com.my/QubeSR/User/salereportAll.php', postData.toString(), httpOptions).timeout(100000).toPromise();
   }
 
   public generateData(baseval, count, yrange) {
@@ -498,25 +861,86 @@ export class Tab1Page implements OnInit{
     return series;
   }
 
-  onButtonTitleClicked(event, item) {
-    // event.stopPropagation();
-    this.reportTypeSelect = item.name;
-    console.log(item.name);
-    switch (item.name) {
-      case 'HOURLY':
-        this.title = 'TOP HOURLY';
-        break;
-      case 'SKU':
-          this.title = 'TOP SKU';
-        break;
-      case 'DEPARTMENT':
-          this.title = 'TOP DEPARTMENT';
-        break;
-      case 'SALES':
-          this.title = 'TOP SALES OUTLET';
-        break;
-    }
+  // onButtonTitleClicked(event, item) {
+  //   // event.stopPropagation();
+  //   this.reportTypeSelect = item.name;
+  //   console.log("reporttypename",item.name);
+  //   switch (item.name) {
+  //     case 'HOURLY':
+  //       this.title = 'TOP HOURLY';
+  //       break;
+  //     case 'SKU':
+  //         this.title = 'TOP SKU';
+  //       break;
+  //     case 'DEPARTMENT':
+  //         this.title = 'TOP DEPARTMENT';
+  //       break;
+  //     case 'SALES':
+  //         this.title = 'TOP SALES OUTLET';
+  //       break;
+  //   }
     
+  // }
+
+  getWeeklyData()
+  {
+    let now = new Date();
+    let dayOfWeek = now.getDay(); //0-6
+    let numDay = now.getDate();//30
+    // console.log("now",now)
+    // console.log("check dayof week",dayOfWeek)
+    // console.log("check numday",numDay)
+    let start = new Date(); //copy
+    let startmonth = new Date()
+    start.setDate(numDay - 6);
+    start.setHours(0, 0, 0, 0);
+  
+    let end = new Date(new Date()); //copy
+    end.setDate(numDay);
+    end.setHours(0, 0, 0, 0);
+    console.log("check end date",now.getDate())
+    //console.log("check end date",end)
+    return [start,end];
   }
 
+  checkDay()
+  {
+    console.log(this.TopDeptclicked)
+    if(this.TopOutletclicked == true)
+    {
+      this.getsalesoutlet();
+    }
+    else if(this.TopDeptclicked == true)
+    {
+      this.getdept();
+    }
+    else if(this.TopSKUclicked == true)
+    {
+      this.getSKU();
+    }
+    else if(this.TopHourclicked == true)
+    {
+      this.gethouroutlet();
+    }
+  }
+
+  checkWeek()
+  {
+    if(this.TopOutletclicked == true)
+    {
+      this.getsalesoutletweekly();
+    }
+    else if(this.TopDeptclicked == true)
+    {
+      this.getdeptWeekly();
+    }
+    else if(this.TopSKUclicked == true)
+    {
+      this.getSKUWeekly();
+    }
+    else if(this.TopHourclicked == true)
+    {
+      this.gethouroutletWeekly();
+    }
+  }
 }

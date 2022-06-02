@@ -132,10 +132,9 @@ import { NativeStorage } from '@ionic-native/native-storage/ngx';
         if(response.length > 0){
           for(let i of response){
             i.isCheck = true;
-            
           }
           localStorage.setItem('storeList',JSON.stringify(response))
-          // console.log(JSON.parse(localStorage.getItem('salesList')))
+          console.log(JSON.parse(localStorage.getItem('storeList')))
           this.checkDB();
         }
         this.donwloadStore.dismiss();

@@ -12,14 +12,33 @@
       SALES DASHBOARD
     </ion-title>
     <div slot="end" >
-      <mat-date-range-input [rangePicker]="picker" [hidden]="true">
+      <!-- <mat-date-range-input [rangePicker]="picker" [hidden]="true">
         <input [(ngModel)]="startTime" matStartDate placeholder="Start date">
         <input [(ngModel)]="endTime" matEndDate placeholder="End date" (click)="changeDate()">
       </mat-date-range-input>
       <mat-datepicker-toggle matSuffix [for]="picker">
       </mat-datepicker-toggle>
       <mat-date-range-picker #picker>
-      </mat-date-range-picker>
+      </mat-date-range-picker> -->
+
+      <!-- <mat-form-field class="example-full-width" appearance="fill">
+        <input matInput [matDatepicker]="myDatePicker" (dateChange)="dateChanged($event)" [(ngModel)]="startTime">
+        <mat-datepicker-toggle [for]="myDatePicker" matSuffix></mat-datepicker-toggle>
+        <mat-datepicker #myDatePicker 
+          startView="year" >
+        </mat-datepicker>
+      </mat-form-field> -->
+
+      <mat-form-field [hidden]="true">
+        <input matInput [matDatepicker]="dp" [formControl]="date">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp
+                        startView="year"
+                        (yearSelected)="chosenYearHandler($event)"
+                        (monthSelected)="chosenMonthHandler($event, dp)"
+                        panelClass="example-month-picker">
+        </mat-datepicker>
+      </mat-form-field>
     </div>
 
   </ion-toolbar>
@@ -43,38 +62,6 @@
       </ion-list>
     </div>
     <ion-button color="success" expand="full" type="submit" (click)="changeOutlet()">DONE</ion-button>
-  </ion-card-content>
-  
-</ion-card>
-
-<!-- SELECT DATE -->
-<ion-card *ngIf="datehide" [@fadeInOut] style="width: 100% !important;margin: 0 !important;padding: 0 !important;height: auto;">
-  <ion-card-content>
-    <ion-list>
-      <ion-list-header>
-        <ion-label>Select Date : </ion-label>
-      </ion-list-header>
-      <ion-item>
-        <ion-icon name="calendar"></ion-icon>
-        <ion-label>FROM</ion-label>
-        <ion-datetime display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY" [max]="toDate" [(ngModel)]="startTime"></ion-datetime>
-      </ion-item>
-      <ion-item>
-        <ion-icon name="calendar"></ion-icon>
-        <ion-label>TO</ion-label>
-        <ion-datetime display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY" [max]="toDate" [(ngModel)]="endTime"></ion-datetime>
-      </ion-item>
-      <!-- <ion-grid> -->
-      <!-- <ion-row>
-            <ion-col col-6>
-              <ion-button color="danger" expand="full" type="submit" (click)="cancelDate()">CANCEL</ion-button>
-            </ion-col>
-            <ion-col col-6> -->
-      <ion-button color="success" expand="full" type="submit" (click)="changeDate()">DONE</ion-button>
-      <!-- </ion-col>
-          </ion-row> -->
-      <!-- </ion-grid> -->
-    </ion-list>
   </ion-card-content>
 </ion-card>
 
@@ -107,7 +94,7 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
+  <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
       <div id="chart">
         <apx-chart
           [series]="chartOptions.series"
@@ -124,7 +111,7 @@
     <ion-grid>
       <ion-row>
         <ion-col size="6">
-          <ion-card class="salescard" (click)="onButtonTitleClicked($event, reportType)">
+          <ion-card class="salescard" (click)="HideTopOutlet()">
             <ion-card-header style="padding-bottom: 0px; font-size: 13px;">
               DAILY TOP OUTLET
             </ion-card-header>
@@ -135,7 +122,7 @@
           </ion-card>
         </ion-col>
         <ion-col size="6">
-          <ion-card class="deptcard" (click)="onButtonTitleClicked($event, reportType)">
+          <ion-card class="deptcard" (click)="HideTopDept()">
             <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
               DAILY TOP DEPT
             </ion-card-header>
@@ -146,7 +133,7 @@
           </ion-card>
         </ion-col>
         <ion-col size="6">
-          <ion-card class="skucard" (click)="onButtonTitleClicked($event, reportType)">
+          <ion-card class="skucard" (click)="HideTopSKU()">
             <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
               DAILY TOP SKU
             </ion-card-header>
@@ -157,12 +144,12 @@
           </ion-card>
         </ion-col>
         <ion-col size="6">
-          <ion-card class="hourcard" (click)="onButtonTitleClicked($event, reportType)">
+          <ion-card class="hourcard" (click)="HideTopHour()">
             <ion-card-header style="padding-bottom: 0px;font-size: 13px;">
               DAILY TOP HOURLY
             </ion-card-header>
             <ion-card-content  style="padding: 10px">
-              <ion-label class="my-label2">{{hourcode}}</ion-label>
+              <ion-label class="my-label2">{{hourcode}} o'clock</ion-label>
               <ion-label style="font-size: 13px;opacity: 0;" class="my-label3">0</ion-label>
             </ion-card-content>
           </ion-card>
@@ -257,35 +244,78 @@
       </ion-row>
     </ion-grid> -->
 
-    <!-- <div class="btndate-btm">
-      <ion-button style="margin-left:2%;">Daily</ion-button>
-      <ion-button style="margin-left:2%;">Weekly</ion-button>
-      <ion-button style="margin-left:2%;">Monthly</ion-button>
+    <div class="btndate-btm">
+      <ion-button class="btndatebtmstyle" fill="clear" (click)="checkDay()">Daily</ion-button>
+      <ion-button class="btndatebtmstyle" fill="clear" (click)="checkWeek()">Weekly</ion-button>
+      <ion-button class="btndatebtmstyle" fill="clear" (click)="dp.open()">Monthly</ion-button>
     </div>
 
-    <div class="listtitle"> -->
-      <!-- <ion-grid>
-        <ion-row>
-          <ion-col style="align-self: center;" size="1">Top</ion-col>
-          <ion-col size="1.5"><ion-input class="listinput" type="tel" maxlength="3"></ion-input></ion-col>
-          <ion-col style="align-self: center;" size="3.5">{{title}}</ion-col>
-          <ion-col size="5.5">      
-            <ion-button (click)="showSetDate()" style="float: right;" >
-            <ion-img src="assets/icon/calendar.png"></ion-img>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid> -->
-   
-<!-- 
-      <ion-list>
-        <ion-item>
-          <ion-label>abc</ion-label>
-        </ion-item>
+  <div *ngIf="TopOutletclicked">
+    <ion-card>
+      <ion-label class="topten">
+        Top 10 Outlet
+      </ion-label>
+      <ion-list style="height: 500px;overflow:scroll">
+        <ion-card class="ToptenCardOutlet" *ngFor="let totaldata of showall | slice:0:10;" >
+          <ion-card-content  style="padding: 10px;">
+            <ion-label class="my-label2">MYR {{ totaldata.Total|number:'1.2-2' }}</ion-label>
+            <ion-label style="font-size: 13px;" class="my-label3">{{ totaldata.Desc }}</ion-label>
+          </ion-card-content>
+        </ion-card>
       </ion-list>
-  </div> -->
+    </ion-card>
+  </div>
+
+  <div *ngIf="TopDeptclicked">
+    <ion-card>
+      <ion-label class="topten">
+        Top 10 Dept
+      </ion-label>
+      <ion-list style="height: 500px;overflow:scroll">
+        <ion-card *ngFor="let totaldata of showallDept | slice:0:10;" style="--webkit-box-shadow: none; box-shadow: none;background-color: transparent;" >
+          <ion-card-content  style="padding: 10px;">
+            <ion-label class="my-label2">MYR {{ totaldata.Total |number:'1.2-2' }}</ion-label>
+            <ion-label style="font-size: 13px;" class="my-label3">{{ totaldata.Desc }}</ion-label>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </ion-card>
+  </div>
+
+    <div *ngIf="TopSKUclicked">
+      <ion-card>
+      <ion-label class="topten">
+        Top 10 SKU
+      </ion-label>
+      <ion-list style="height: 500px;overflow:scroll">
+      <ion-card *ngFor="let totaldata of showallsku | slice:0:10;" style="--webkit-box-shadow: none; box-shadow: none;background-color: transparent;" >
+        <ion-card-content  style="padding: 10px;">
+          <ion-label class="my-label2">MYR {{ totaldata.Total|number:'1.2-2'  }}</ion-label>
+          <ion-label style="font-size: 13px;" class="my-label3">{{ totaldata.Desc }}</ion-label>
+        </ion-card-content>
+        <div><br/></div>
+      </ion-card>
+      </ion-list>
+    </ion-card>
+    </div>
+
+    <div *ngIf="TopHourclicked">
+      <ion-card>
+      <ion-label class="topten">
+        Top 10 Hourly
+      </ion-label>
+      <ion-list style="height: 500px;overflow:scroll">
+        <ion-card *ngFor="let totaldata of showallhour" style="--webkit-box-shadow: none; box-shadow: none;background-color: transparent;" >
+          <ion-card-content  style="padding: 10px;">
+            <!-- <ion-label class="my-label2" [routerLink]="['/Desc', totaldata.Desc]">{{totaldata.Code}} O'Clock</ion-label> -->
+          </ion-card-content>
+          <div><br/></div>
+        </ion-card>
+        </ion-list>
+      </ion-card>
+    </div>
   
-    <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
+    <!-- <ion-card style="max-height: 250px;--border-radius: 5px;padding: 0px;">
       <div id="chart">
         <apx-chart
           [series]="chartOptions.series"
@@ -296,7 +326,7 @@
           [dataLabels]="chartOptions.dataLabels"
         ></apx-chart>
       </div>
-    </ion-card>
+    </ion-card> -->
     <!-- <ion-card>
       <ion-card-header>
         Bar Chart
@@ -328,4 +358,5 @@
       </ion-card-content>
     </ion-card> -->
   </div>
+
 </ion-content>

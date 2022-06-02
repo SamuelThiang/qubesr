@@ -1,7 +1,7 @@
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Tab1Page } from './tab1.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
@@ -10,6 +10,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatNativeDateModule} from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+
 @NgModule({
   imports: [
     IonicModule,
@@ -20,7 +22,9 @@ import {MatNativeDateModule} from '@angular/material/core';
     NgApexchartsModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatInputModule,
+    ReactiveFormsModule
   ],
   declarations: [Tab1Page]
 })
