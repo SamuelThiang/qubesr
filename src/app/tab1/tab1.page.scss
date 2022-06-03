@@ -93,7 +93,6 @@ ion-card-header{
 .listinput{
   width: 40px;
   border:1px solid black;
-  
 }
 
 .salescard
@@ -101,31 +100,38 @@ ion-card-header{
   border:1px solid black;
   border-radius:30px;
   background-image: linear-gradient( 135deg, #81FBB8 10%, #28C76F 100%);
-  height: 105px;
+  height: 98px;
+  color:#f7f0f0;
 }
 .deptcard{
   border:1px solid black;
   border-radius:30px;
   background-image: linear-gradient( 135deg, #FEC163 10%, #DE4313 100%);
-  height: 105px;
+  height: 98px;
+  color:#f7f0f0;
 }
 .skucard{
   border:1px solid black;
   border-radius:30px;
   background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);
-  height: 105px;
+  height: 98px;
+  color:#f7f0f0;
 }
 .hourcard{
   border:1px solid black;
   border-radius:30px;
   background-image: linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%);
-  height: 105px;
+  height: 98px;
+  color:#f7f0f0;
 }
 .topten
 {
   font-size: 2em;
   padding-left: 10px;
   font-weight: bold;
+  align-items:center;
+  display:flex;
+  
 }
 .ToptenCardOutlet
 {

@@ -88,6 +88,7 @@ export class Tab1Page implements OnInit{
   alertCtrl: any;
   loading: any;
   getstartdate: string;
+  TopNumber :Number;
   startTime: string = new Date().toISOString()
   endTime: string = new Date().toISOString()
   datehide: boolean = false;
@@ -97,6 +98,7 @@ export class Tab1Page implements OnInit{
   TopSKUclicked:boolean =false;
   TopHourclicked:boolean =false;
   TopWeeklyDeptClicked :boolean =false;
+  checkReportType: boolean = false;
   reportType = [];
   storeoutlet = [];
   storepath=[];
@@ -202,6 +204,11 @@ export class Tab1Page implements OnInit{
 
   date = new FormControl(moment());
 
+  onChange(newValue){
+    console.log("checknew",newValue);
+    this.TopNumber = newValue;
+  }
+
   chosenYearHandler(normalizedYear: Moment) {
     const ctrlValue = this.date.value;
     ctrlValue.year(normalizedYear.year());
@@ -222,29 +229,36 @@ export class Tab1Page implements OnInit{
     
     this.monthEndConvert = this.datePipe.transform(monthend, 'yyMMdd'); 
 
-    if(this.TopOutletclicked == true)
+    
+    if(this.TopOutletclicked === true)
     {
       this.getsalesoutletMonthly()
     }
-    else if(this.TopDeptclicked == true)
+    else if(this.TopDeptclicked === true)
     {
       this.getdeptMonthly();
     }
-    else if(this.TopSKUclicked == true)
+    else if(this.TopSKUclicked === true)
     {
       this.getSKUMonthly();
     }
-    else if(this.TopHourclicked == true)
+    else if(this.TopHourclicked === true)
     {
       this.gethouroutletWeekly();
     }
   }
 
   getReportType(){
+    
     this.reportType = JSON.parse(localStorage.getItem('reportList')).filter((reportRes)=>{
       return reportRes.value == 'T'
     });
-    console.log(this.reportType)
+    console.log(JSON.parse(localStorage.getItem('reportList')))
+
+    if(this.reportType)
+    {
+      this.checkReportType = true;
+    }
   }
 
   selectOutlet(outlet, index, event) {
@@ -588,8 +602,8 @@ export class Tab1Page implements OnInit{
      //convert to array
      var toarr = Object.values(totals);
       toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
-     this.showallsku = []
-     this.showallsku = toarr;
+     this.showall = []
+     this.showall = toarr;
   }
 
   getsalesoutletweekly()
@@ -759,10 +773,10 @@ export class Tab1Page implements OnInit{
 
   HideTopOutlet()
   {
-    if(this.TopDeptclicked === false || this.TopHourclicked === false|| this.TopSKUclicked === false)
+    if(this.TopDeptclicked === false || this.TopHourclicked === false || this.TopSKUclicked === false)
     {
-      this.TopDeptclicked =false;
-      this.TopSKUclicked =false;
+      this.TopDeptclicked = false;
+      this.TopSKUclicked = false;
       this.TopOutletclicked = true;
       this.TopHourclicked = false;
     }
@@ -771,12 +785,13 @@ export class Tab1Page implements OnInit{
   HideTopDept()
   {
     
-    if(this.TopOutletclicked === true || this.TopHourclicked === true|| this.TopSKUclicked === true)
+    if(this.TopOutletclicked === true || this.TopHourclicked === true || this.TopSKUclicked === true)
     {
-      this.TopDeptclicked =true;
-      this.TopSKUclicked =false;
+      this.TopDeptclicked = true;
+      this.TopSKUclicked = false;
       this.TopOutletclicked = false;
       this.TopHourclicked = false;
+
     }
     
   }
@@ -785,8 +800,8 @@ export class Tab1Page implements OnInit{
   {
     if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopHourclicked === true)
     {
-      this.TopDeptclicked =false;
-      this.TopSKUclicked =true;
+      this.TopDeptclicked = false;
+      this.TopSKUclicked= true;
       this.TopOutletclicked = false;
       this.TopHourclicked = false;
     }
@@ -796,10 +811,10 @@ export class Tab1Page implements OnInit{
   {
     if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopSKUclicked === true)
     {
-      this.TopDeptclicked =false;
-      this.TopSKUclicked =false;
-      this.TopOutletclicked = false;
-      this.TopHourclicked = true;
+      this.TopDeptclicked= false;
+      this.TopSKUclicked = false;
+      this.TopOutletclicked =false;
+      this.TopHourclicked =true;
     }
   }
 
@@ -898,7 +913,7 @@ export class Tab1Page implements OnInit{
     let end = new Date(new Date()); //copy
     end.setDate(numDay);
     end.setHours(0, 0, 0, 0);
-    console.log("check end date",now.getDate())
+    //console.log("check end date",now.getDate())
     //console.log("check end date",end)
     return [start,end];
   }
@@ -910,15 +925,15 @@ export class Tab1Page implements OnInit{
     {
       this.getsalesoutlet();
     }
-    else if(this.TopDeptclicked == true)
+    else if(this.TopDeptclicked === true)
     {
       this.getdept();
     }
-    else if(this.TopSKUclicked == true)
+    else if(this.TopSKUclicked === true)
     {
       this.getSKU();
     }
-    else if(this.TopHourclicked == true)
+    else if(this.TopHourclicked === true)
     {
       this.gethouroutlet();
     }
@@ -926,19 +941,19 @@ export class Tab1Page implements OnInit{
 
   checkWeek()
   {
-    if(this.TopOutletclicked == true)
+    if(this.TopOutletclicked === true)
     {
       this.getsalesoutletweekly();
     }
-    else if(this.TopDeptclicked == true)
+    else if(this.TopDeptclicked === true)
     {
       this.getdeptWeekly();
     }
-    else if(this.TopSKUclicked == true)
+    else if(this.TopSKUclicked === true)
     {
       this.getSKUWeekly();
     }
-    else if(this.TopHourclicked == true)
+    else if(this.TopHourclicked === true)
     {
       this.gethouroutletWeekly();
     }
