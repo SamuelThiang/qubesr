@@ -328,8 +328,8 @@ export class Tab1Page implements OnInit{
       this.storeoutlet = this.outlet.filter((result)=>{
         return result.isCheck == true
       });
-      storepath = storepath + ',' + this.outlet.map(x=>{
-      return x.value;
+      storepath = storepath + ',' + this.storeoutlet.map(x=>{
+        return x.value;
       });
       var resOutlet = storepath.substring(1);
 
@@ -389,9 +389,11 @@ export class Tab1Page implements OnInit{
         return result.isCheck == true
       });
       let storepath = '';
-      storepath = storepath + ',' + this.outlet.map(x=>{
+      storepath = storepath + ',' + this.storeoutlet.map(x=>{
       return x.value;
       });
+      console.log("storeoutlet",this.storeoutlet)
+      console.log("outlet",this.outlet)
       var resOutlet = storepath.substring(1);
 
       this.getReport(this.returnDate(start), this.returnDate(end),'DEPARTMENT', resOutlet).then((res:any)=>{
@@ -430,7 +432,7 @@ export class Tab1Page implements OnInit{
         return result.isCheck == true
       });
       let storepath = '';
-      storepath = storepath + ',' + this.outlet.map(x=>{
+      storepath = storepath + ',' + this.storeoutlet.map(x=>{
       return x.value;
       });
       var resOutlet = storepath.substring(1);
@@ -447,7 +449,7 @@ export class Tab1Page implements OnInit{
     this.storeoutlet = this.outlet.filter((result)=>{
       return result.isCheck == true
     });
-    storepath = storepath + ',' + this.outlet.map(x=>{
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
     return x.value;
     });
     var resOutlet = storepath.substring(1);
@@ -502,7 +504,7 @@ export class Tab1Page implements OnInit{
     this.storeoutlet = this.outlet.filter((result)=>{
       return result.isCheck == true
     });
-    storepath = storepath + ',' + this.outlet.map(x=>{
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
     return x.value;
     });
     var resOutlet = storepath.substring(1);
@@ -541,7 +543,7 @@ export class Tab1Page implements OnInit{
     this.storeoutlet = this.outlet.filter((result)=>{
       return result.isCheck == true
     });
-    storepath = storepath + ',' + this.outlet.map(x=>{
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
     return x.value;
     });
     var resOutlet = storepath.substring(1);
@@ -553,18 +555,20 @@ export class Tab1Page implements OnInit{
   
   getsalesoutlet()
   {
+    
     var storepath ="";
     this.storeoutlet = this.outlet.filter((result)=>{
       return result.isCheck == true
     });
     
-    storepath = storepath + ',' + this.outlet.map(x=>{
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
       return x.value;
     });
     var resOutlet = storepath.substring(1);
     
     this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime), 'SALES' , resOutlet).then((res:any)=>{
       this.findTopOutlet(res);
+      console.log(res)
       this.sumTotal(res);
       this.sumTotaltrx(res);
     })
@@ -595,7 +599,7 @@ export class Tab1Page implements OnInit{
          var t = (Math.round(testnumber * 100) / 100).toFixed(2);
          
       }
-      //console.log("abc",t);
+      console.log("abc",totals);
       this.largest = ("RM " + t.toString());
      //console.log(this.largetsku,this.skustore) 
 
@@ -604,6 +608,7 @@ export class Tab1Page implements OnInit{
       toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
      this.showall = []
      this.showall = toarr;
+     console.log("toarr",this.showall)
   }
 
   getsalesoutletweekly()
@@ -712,8 +717,8 @@ export class Tab1Page implements OnInit{
       var toarr = Object.values(totalshour);
       toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
  
-      this.showall = []
-      this.showall= toarr;
+      var showalls = []
+      showalls= toarr;
       //console.log("check hour",this.showall)
       //console.log("checkoutlet",this.showall)
   }
