@@ -31,6 +31,7 @@ import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import { default as _rollupMoment, Moment } from 'moment';
 
+
 const moment = _rollupMoment || _moment;
 
 export const MY_FORMATS = {
@@ -88,7 +89,7 @@ export class Tab1Page implements OnInit{
   alertCtrl: any;
   loading: any;
   getstartdate: string;
-  TopNumber :Number;
+  qtn :number = 10;
   startTime: string = new Date().toISOString()
   endTime: string = new Date().toISOString()
   datehide: boolean = false;
@@ -107,6 +108,10 @@ export class Tab1Page implements OnInit{
   showallDept =[];
   showtotal =[];
   outlet = [];
+  toarr =[];
+  toarrDept =[];
+  toarrSku=[];
+  toarrHour=[];
   //topoutlet
   largest = "RM 0";
   store = "";
@@ -123,6 +128,8 @@ export class Tab1Page implements OnInit{
   largetsku = "RM 0";
   skustore="";
 
+  selfStart:string;
+  selfEnd:string;
   autocount = 0;
   dataB: any;
   selectedOutlet = [];
@@ -198,17 +205,58 @@ export class Tab1Page implements OnInit{
     this.getReportType();
     this.getstorelist();
     this.getTodayReport();
-    this.getWeeklyData();
-    
+    this.getWeeklyData(); 
   }
 
   date = new FormControl(moment());
 
-  onChange(newValue){
-    console.log("checknew",newValue);
-    this.TopNumber = newValue;
+  startC(event:any)
+  {
+    this.selfStart = event.value;
+    this.selfStart = this.datePipe.transform(this.selfStart,'yyMMdd');
+    console.log("selfstart",this.selfStart)
+  }
+  endC(event:any)
+  {
+    this.selfEnd = event.value;
+    this.selfEnd = this.datePipe.transform(this.selfEnd,'yyMMdd');
+    console.log("selfEnd",this.selfEnd)
+
+    if(this.TopOutletclicked === true)
+    {
+      this.getsalesoutletSelf()
+    }
+    else if(this.TopDeptclicked === true)
+    {
+      this.getdeptSelf();
+    }
+    else if(this.TopSKUclicked === true)
+    {
+      this.getSKUSelf();
+    }
+    else if(this.TopHourclicked === true)
+    {
+      this.gethouroutlet();
+    }
   }
 
+  clicked()
+  {
+    if(this.TopOutletclicked === true)
+    {
+      this.showall =this.toarr.slice(0,this.qtn)
+      // console.log("checkslice",this.showall)
+    }
+    else if(this.TopDeptclicked === true)
+    {
+      this.showallDept =this.toarrDept.slice(0,this.qtn)
+    }
+    else if(this.TopSKUclicked === true)
+    {
+      this.showallsku =this.toarrSku.slice(0,this.qtn)
+    }
+  }
+  
   chosenYearHandler(normalizedYear: Moment) {
     const ctrlValue = this.date.value;
     ctrlValue.year(normalizedYear.year());
@@ -373,13 +421,13 @@ export class Tab1Page implements OnInit{
     this.largetdept = ("RM " + t.toString());
   
     //convert object to array and sort array
-    var toarr = Object.values(totals);
-    toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+    this.toarrDept = Object.values(totals);
+    this.toarrDept.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
 
     //top10result
     this.showallDept = []
-    this.showallDept = toarr;
-    //console.log("check",this.showallDept)
+    this.showallDept = this.toarrDept;
+    console.log("check",this.showallDept)
   }
 
   getdeptWeekly()
@@ -417,12 +465,12 @@ export class Tab1Page implements OnInit{
     }, {});
   
     //convert object to array and sort array
-    var toarr = Object.values(totals);
-    toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+    this.toarrDept = Object.values(totals);
+    this.toarrDept.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
 
     //top10result
     this.showallDept = []
-    this.showallDept = toarr;
+    this.showallDept = this.toarrDept;
     //console.log("check",this.showallDept)
   }
 
@@ -438,6 +486,23 @@ export class Tab1Page implements OnInit{
       var resOutlet = storepath.substring(1);
 
       this.getReport(this.monthStartConvert, this.monthEndConvert,'DEPARTMENT', resOutlet).then((res:any)=>{
+      // get daily top dept
+      this.findTopdeptWeekly(res);
+      }) 
+  }
+
+  getdeptSelf()
+  {
+      this.storeoutlet = this.outlet.filter((result)=>{
+        return result.isCheck == true
+      });
+      let storepath = '';
+      storepath = storepath + ',' + this.storeoutlet.map(x=>{
+      return x.value;
+      });
+      var resOutlet = storepath.substring(1);
+
+      this.getReport(this.selfStart, this.selfEnd,'DEPARTMENT', resOutlet).then((res:any)=>{
       // get daily top dept
       this.findTopdeptWeekly(res);
       }) 
@@ -490,10 +555,10 @@ export class Tab1Page implements OnInit{
      //console.log(this.largetsku,this.skustore) 
 
      //convert to array
-     var toarr = Object.values(totals);
-      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.toarrSku = Object.values(totals);
+     this.toarrSku.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
      this.showallsku = []
-     this.showallsku = toarr;
+     this.showallsku = this.toarrSku;
 
   }
 
@@ -529,10 +594,10 @@ export class Tab1Page implements OnInit{
     }, {});
 
      //convert to array
-     var toarr = Object.values(totals);
-      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.toarrSku = Object.values(totals);
+     this.toarrSku.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
      this.showallsku = []
-     this.showallsku = toarr;
+     this.showallsku = this.toarrSku;
      console.log("check",this.showallsku)
       // console.log("str",this.showtotal)
   }
@@ -552,10 +617,25 @@ export class Tab1Page implements OnInit{
     this.findTopskuWeekly(res);
     })
   }
+
+  getSKUSelf()
+  {    
+    let storepath = '';
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
+    return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    this.getReport(this.selfStart, this.selfEnd,'SKU', resOutlet).then((res:any)=>{
+    // console.log(res)
+    this.findTopskuWeekly(res);
+    })
+  }
   
   getsalesoutlet()
   {
-    
     var storepath ="";
     this.storeoutlet = this.outlet.filter((result)=>{
       return result.isCheck == true
@@ -568,7 +648,7 @@ export class Tab1Page implements OnInit{
     
     this.getReport(this.returnDate(this.startTime), this.returnDate(this.endTime), 'SALES' , resOutlet).then((res:any)=>{
       this.findTopOutlet(res);
-      console.log(res)
+      console.log(this.returnDate(this.startTime),this.returnDate(this.endTime))
       this.sumTotal(res);
       this.sumTotaltrx(res);
     })
@@ -599,16 +679,16 @@ export class Tab1Page implements OnInit{
          var t = (Math.round(testnumber * 100) / 100).toFixed(2);
          
       }
-      console.log("abc",totals);
+      // console.log("abc",totals);
       this.largest = ("RM " + t.toString());
      //console.log(this.largetsku,this.skustore) 
 
      //convert to array
-     var toarr = Object.values(totals);
-      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.toarr = Object.values(totals);
+      this.toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
      this.showall = []
-     this.showall = toarr;
-     console.log("toarr",this.showall)
+     this.showall = this.toarr;
+     console.log("abc",this.toarr);
   }
 
   getsalesoutletweekly()
@@ -644,12 +724,13 @@ export class Tab1Page implements OnInit{
     }, {});
 
      //convert to array
-     var toarr = Object.values(totals);
-     toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+     this.toarr = Object.values(totals);
+     this.toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
 
      this.showall = []
-     this.showall= toarr;
-     //console.log("checkoutlet",this.showall)
+     this.showall= this.toarr;
+     console.log("checkoutlet weekly",this.showall)
+     
   }
 
   getsalesoutletMonthly()
@@ -666,6 +747,24 @@ export class Tab1Page implements OnInit{
     console.log("montconsaleshere",this.monthStartConvert)
     console.log("montconsaleshere",this.monthEndConvert)
     this.getReport(this.monthStartConvert, this.monthEndConvert, 'SALES' , resOutlet).then((res:any)=>{
+      this.findTopOutletWeekly(res);
+    })
+  }
+
+  getsalesoutletSelf()
+  {
+    var storepath ="";
+    this.storeoutlet = this.outlet.filter((result)=>{
+      return result.isCheck == true
+    });
+    
+    storepath = storepath + ',' + this.storeoutlet.map(x=>{
+      return x.value;
+    });
+    var resOutlet = storepath.substring(1);
+    console.log("selfStart",this.selfStart)
+    console.log("montconsaleshere",this.selfEnd)
+    this.getReport(this.selfStart, this.selfEnd, 'SALES' , resOutlet).then((res:any)=>{
       this.findTopOutletWeekly(res);
     })
   }
@@ -714,11 +813,11 @@ export class Tab1Page implements OnInit{
         }
       }
       //console.log(this.largesthour,this.hourcode)
-      var toarr = Object.values(totalshour);
-      toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+      this.toarrHour = Object.values(totalshour);
+      this.toarrHour.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
  
       var showalls = []
-      showalls= toarr;
+      showalls= this.toarrHour;
       //console.log("check hour",this.showall)
       //console.log("checkoutlet",this.showall)
   }
@@ -754,11 +853,11 @@ export class Tab1Page implements OnInit{
     }, {});
 
     //convert to array
-     var toarr = Object.values(totalshour);
-     toarr.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
+    this.toarrHour = Object.values(totalshour);
+     this.toarrHour.sort((a:any, b:any) => parseFloat(b.Total) - parseFloat(a.Total));
 
      this.showall = []
-     this.showall= toarr;
+     this.showall= this.toarrHour;
      console.log("checkoutlet",this.showall)
   }
 
@@ -778,6 +877,8 @@ export class Tab1Page implements OnInit{
 
   HideTopOutlet()
   {
+    this.qtn=10;
+    this.showall =this.toarr.slice(0,this.qtn);
     if(this.TopDeptclicked === false || this.TopHourclicked === false || this.TopSKUclicked === false)
     {
       this.TopDeptclicked = false;
@@ -789,20 +890,22 @@ export class Tab1Page implements OnInit{
 
   HideTopDept()
   {
-    
+    this.qtn=10;
+    this.showallDept =this.toarrDept.slice(0,this.qtn);
     if(this.TopOutletclicked === true || this.TopHourclicked === true || this.TopSKUclicked === true)
     {
       this.TopDeptclicked = true;
       this.TopSKUclicked = false;
       this.TopOutletclicked = false;
       this.TopHourclicked = false;
-
     }
-    
+    console.log("dept",this.toarr)
   }
 
   HideTopSKU()
   {
+    this.qtn=10;
+    this.showallsku =this.toarrSku.slice(0,this.qtn);
     if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopHourclicked === true)
     {
       this.TopDeptclicked = false;
@@ -814,6 +917,8 @@ export class Tab1Page implements OnInit{
 
   HideTopHour()
   {
+    this.qtn=10;
+    this.showallsku =this.toarrHour.slice(0,this.qtn);
     if(this.TopOutletclicked === true || this.TopDeptclicked === true || this.TopSKUclicked === true)
     {
       this.TopDeptclicked= false;
@@ -848,6 +953,7 @@ export class Tab1Page implements OnInit{
   
   async getReport(StartDate, EndDate, ReportType, outletArray) 
   {
+    
     //SEND USERNAME & PASSWORD TO SERVER CHECK LOGIN
     let postData = new URLSearchParams();
     postData.append('reportType', ReportType);
@@ -861,7 +967,6 @@ export class Tab1Page implements OnInit{
         'Content-Type': 'application/x-www-form-urlencoded'
       })
     };
-
     return this.http.post('https://qubelive.com.my/QubeSR/User/salereportAll.php', postData.toString(), httpOptions).timeout(100000).toPromise();
   }
 
@@ -920,22 +1025,29 @@ export class Tab1Page implements OnInit{
     end.setHours(0, 0, 0, 0);
     //console.log("check end date",now.getDate())
     //console.log("check end date",end)
+    
     return [start,end];
   }
 
   checkDay()
-  {
+  { 
     console.log(this.TopDeptclicked)
     if(this.TopOutletclicked == true)
     {
+      this.qtn=10;
+      this.showall =this.toarr.slice(0,this.qtn);
       this.getsalesoutlet();
     }
     else if(this.TopDeptclicked === true)
     {
+      this.qtn=10;
+      this.showallDept =this.toarrDept.slice(0,this.qtn);
       this.getdept();
     }
     else if(this.TopSKUclicked === true)
     {
+      this.qtn=10;
+      this.showallsku =this.toarrSku.slice(0,this.qtn);
       this.getSKU();
     }
     else if(this.TopHourclicked === true)
@@ -948,14 +1060,20 @@ export class Tab1Page implements OnInit{
   {
     if(this.TopOutletclicked === true)
     {
+      this.qtn=10;
+      this.showall =this.toarr.slice(0,this.qtn);
       this.getsalesoutletweekly();
     }
     else if(this.TopDeptclicked === true)
     {
+      this.qtn=10;
+      this.showallDept =this.toarrDept.slice(0,this.qtn);
       this.getdeptWeekly();
     }
     else if(this.TopSKUclicked === true)
     {
+      this.qtn=10;
+      this.showallsku =this.toarrSku.slice(0,this.qtn);
       this.getSKUWeekly();
     }
     else if(this.TopHourclicked === true)

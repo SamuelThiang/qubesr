@@ -57,7 +57,11 @@ ion-fab-list {
     font-weight: bold;  
     display: block;
   }
-
+.Price{
+  font-size: 25px;
+  font-weight: bold;  
+  display: block;
+}
 
 .chart-container {
     width:  100% !important ;
@@ -73,7 +77,6 @@ ion-fab-list {
 
 .btndate-btm{
   margin-top: 5%;
-  padding-bottom:10px ;
 }
 
 ion-card-header{
@@ -126,12 +129,12 @@ ion-card-header{
 }
 .topten
 {
-  font-size: 2em;
+  font-size: 20px;
+  margin-top:3%;
   padding-left: 10px;
   font-weight: bold;
   align-items:center;
   display:flex;
-  
 }
 .ToptenCardOutlet
 {
@@ -160,4 +163,34 @@ mat-form-field {
 
 mat-year-view .mat-calendar-body-label{
   display: none !important;
+}
+
+
+.btn-position{
+  display: flex; 
+  justify-content: center;
+  height: 100px;
+}
+
+.btn-filter
+{
+  width: 30%;
+  height: 40%;
+  border-radius: 30px;
+  color:white;
+  background-color: rgb(192, 45, 45);
+  text-align: center;
+  margin-top: 6%;
+  padding: 10px;
+}
+
+.inputvalue
+{
+  max-width: 11%;
+  text-align: center;
+  border-bottom: 1px solid black;
+  --padding-top:0px !important;
+  --padding-end:0px !important;
+  --padding-bottom:0px !important;
+  --padding-start:0px !important;
 }
