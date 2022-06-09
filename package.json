@@ -45,6 +45,7 @@
     "@ionic/cordova-builders": "^6.1.0",
     "@syncfusion/ej2-angular-calendars": "^20.1.56",
     "apexcharts": "^3.35.3",
+    "chart.js": "^3.8.0",
     "cordova-android": "10.1.2",
     "cordova-plugin-splashscreen": "^6.0.1",
     "ionic-calendar-date-picker": "^0.1.2",

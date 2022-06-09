@@ -26,13 +26,14 @@ import {DatePipe} from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
-  imports: [BrowserModule, HttpClientModule, IonicModule.forRoot(),ReactiveFormsModule, AppRoutingModule,DateRangePickerModule,BrowserAnimationsModule,FormsModule,MatDatepickerModule,MatInputModule,MatFormFieldModule,],
+  imports: [BrowserModule,NgApexchartsModule, HttpClientModule, IonicModule.forRoot(),ReactiveFormsModule, AppRoutingModule,DateRangePickerModule,BrowserAnimationsModule,FormsModule,MatDatepickerModule,MatInputModule,MatFormFieldModule,],
   providers: [
     StatusBar,
     SplashScreen,

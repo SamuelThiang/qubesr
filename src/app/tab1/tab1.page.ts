@@ -12,10 +12,18 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
-  ApexDataLabels,
+  ApexTitleSubtitle,
+  ApexPlotOptions,
+  ApexStroke,
+  ApexMarkers,
+  ApexGrid,
   ApexTooltip,
-  ApexStroke
+  ApexYAxis,
+  ApexDataLabels,
+  ApexLegend,
+  ApexFill
 } from "ng-apexcharts";
+
 import { concat } from "rxjs";
 import {
   MomentDateAdapter,
@@ -47,12 +55,22 @@ export const MY_FORMATS = {
 };
 
 export type ChartOptions = {
-  series: ApexAxisChartSeries;
   chart: ApexChart;
-  xaxis: ApexXAxis;
+  series: ApexAxisChartSeries | any[];
   stroke: ApexStroke;
+  markers: ApexMarkers;
+  grid: ApexGrid;
   tooltip: ApexTooltip;
+  colors: any[];
+  labels: any[];
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  title: ApexTitleSubtitle;
+  subtitle: ApexTitleSubtitle;
   dataLabels: ApexDataLabels;
+  legend: ApexLegend;
+  fill: ApexFill;
+  plotOptions: ApexPlotOptions;
 };
 
 @Component({
@@ -85,7 +103,7 @@ export class Tab1Page implements OnInit{
 
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
-  
+  public radial: Partial<ChartOptions>;
   alertCtrl: any;
   loading: any;
   getstartdate: string;
@@ -158,46 +176,53 @@ export class Tab1Page implements OnInit{
     private decimalPipe: DecimalPipe,
     private datePipe: DatePipe,
     private navCtrl: NavController) 
-    
     {
-      this.chartOptions = {
-        series: [
+      this.radial = 
+      {
+        chart: 
+        {
+          type: 'radialBar',
+          height: 180,
+          
+        },
+        series: [70],
+        plotOptions: 
+        {
+          radialBar: 
           {
-            name: "series1",
-            data: [31, 40, 28, 51, 42, 109, 100]
+            track: 
+            {
+              background: '#c7c7c7',
+              margin: 0,
+              strokeWidth: '70%',
+            },
+            dataLabels: 
+            {
+              name: 
+              {
+                color: '#fff',
+                offsetY: -10,
+                fontSize: '14px',
+              },
+              value: 
+              {
+                color: '#000000',
+                fontSize: '35px',
+                fontWeight:'bold',
+                offsetY: -2,
+              },
+            },
+            hollow: 
+            {
+              size: '65%',
+            },
           },
-          {
-            name: "series2",
-            data: [11, 32, 45, 32, 34, 52, 41]
-          }
-        ],
-        chart: {
-          height: 350,
-          type: "area"
         },
-        dataLabels: {
-          enabled: false
+        fill: 
+        {
+          colors: ['#fd6585'],
         },
-        stroke: {
-          curve: "smooth"
-        },
-        xaxis: {
-          type: "datetime",
-          categories: [
-            "2018-09-19T00:00:00.000Z",
-            "2018-09-19T01:30:00.000Z",
-            "2018-09-19T02:30:00.000Z",
-            "2018-09-19T03:30:00.000Z",
-            "2018-09-19T04:30:00.000Z",
-            "2018-09-19T05:30:00.000Z",
-            "2018-09-19T06:30:00.000Z"
-          ]
-        },
-        tooltip: {
-          x: {
-            format: "dd/MM/yy HH:mm"
-          }
-        }
+        labels: ['Tasks'],
       };
     }
   
@@ -206,6 +231,7 @@ export class Tab1Page implements OnInit{
     this.getstorelist();
     this.getTodayReport();
     this.getWeeklyData(); 
+    
   }
 
   date = new FormControl(moment());
@@ -940,7 +966,8 @@ export class Tab1Page implements OnInit{
       var t = (Math.round(total * 100) / 100).toFixed(2);
     }
     this.totalSales = ("RM " + t.toString());
-   
+    console.log("array",array)
+    //this.totalSales = (t.toString());
   }
 
   sumTotaltrx(array){
