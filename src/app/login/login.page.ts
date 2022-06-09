@@ -26,6 +26,7 @@ import { NativeStorage } from '@ionic-native/native-storage/ngx';
     expDate: string = "";
     dataB: any;
     remembercheck: boolean = false;
+    getTruevalue = [];
   
     constructor(
       private alertCtrl: AlertController,
@@ -129,14 +130,22 @@ import { NativeStorage } from '@ionic-native/native-storage/ngx';
       };
   
       this.http.post('https://qubelive.com.my/QubeSR/User/ListAll.php', postData.toString(), httpOptions).subscribe((response: any) => {
-        if(response.length > 0){
-          for(let i of response){
-            i.isCheck = true;
+        this.getTruevalue = response;
+        if(response.length>0){
+          for(let i of response)
+          {
+            i.isCheck = false;
           }
           localStorage.setItem('storeList',JSON.stringify(response))
-          console.log(JSON.parse(localStorage.getItem('storeList')))
+          console.log("checkvalye",this.getTruevalue)
           this.checkDB();
         }
+        for(let i of response.slice(0,10))
+        {
+          i.isCheck = true;
+        }
+        localStorage.setItem('storeList',JSON.stringify(response))
+        this.checkDB();
         this.donwloadStore.dismiss();
       }, error => {
         console.error(error);

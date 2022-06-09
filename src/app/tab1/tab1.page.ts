@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
-import { AlertController, LoadingController, Platform,NavController } from '@ionic/angular';
+import { AlertController, LoadingController, Platform,NavController,ModalController } from '@ionic/angular';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -7,6 +7,7 @@ import { DecimalPipe } from '@angular/common';
 import 'rxjs/add/operator/timeout';
 import {DatePipe} from '@angular/common';
 import {FormControl} from '@angular/forms';
+import { Tab2Page } from '../tab2/tab2.page'
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -148,7 +149,6 @@ export class Tab1Page implements OnInit{
 
   selfStart:string;
   selfEnd:string;
-  autocount = 0;
   dataB: any;
   selectedOutlet = [];
   reportTypeSelect: string = "SALES";
@@ -172,6 +172,7 @@ export class Tab1Page implements OnInit{
     public loadingController: LoadingController,
     private http: HttpClient,
     public platform: Platform,
+    public modalController: ModalController,
     public cdRef: ChangeDetectorRef,
     private decimalPipe: DecimalPipe,
     private datePipe: DatePipe,
@@ -231,10 +232,21 @@ export class Tab1Page implements OnInit{
     this.getstorelist();
     this.getTodayReport();
     this.getWeeklyData(); 
-    
   }
 
   date = new FormControl(moment());
+
+  async showProfile(){
+    const modal = await this.modalController.create({
+      component: Tab2Page,
+      // componentProps: {
+      //   storeList: this.storeList
+      // },
+      initialBreakpoint: 1,
+      breakpoints: [0, 1]
+    });
+    await modal.present();
+  }
 
   startC(event:any)
   {

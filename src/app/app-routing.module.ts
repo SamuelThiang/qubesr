@@ -8,6 +8,7 @@ const routes: Routes = [
   {path: 'login',loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)},
   {path: 'tabs',canActivate: [AuthGuardService], loadChildren:()=>import ('./tabs/tabs.module').then(m=>m.TabsPageModule)},
   {path: 'tab1',loadChildren: () => import('./tab1/tab1.module').then(m => m.Tab1PageModule)},
+  {path: 'tab2',loadChildren: () => import('./tab2/tab2.module').then(m => m.Tab2PageModule)},
 
 ];
 @NgModule({

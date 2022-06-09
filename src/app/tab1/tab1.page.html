@@ -3,7 +3,13 @@
 <!-- HEADER -->
     <ion-grid>
       <ion-row>
-        <ion-col size="7" style="font-weight:bold;align-self: center;font-size: 1.8em;">
+        <ion-col size="2" >
+            <ion-button (click)="showProfile()" fill="clear" > 
+              <ion-icon slot="icon-only" name="menu-outline" style="color: #9d0000;"></ion-icon>
+            </ion-button>
+        </ion-col>
+
+        <ion-col size="5" style="font-weight:bold;align-self: center;font-size: 1.8em;">
           <ion-label>
             Dashboard
           </ion-label>
@@ -40,6 +46,7 @@
         <ion-radio-group>
           <ion-list-header>
             <ion-label>Select Store : </ion-label>
+            <ion-searchbar [formControl]="searchField" debounce="100"></ion-searchbar>
           </ion-list-header>
           <ion-item *ngFor="let oi of outlet;let i = index">
             <ion-label>{{oi.name}}</ion-label>
