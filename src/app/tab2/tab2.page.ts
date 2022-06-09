@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController, Platform } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthenticationService } from '../../services/authentication.service';
+import { modalController, ViewController } from '@ionic/core';
 
 
 @Component({
@@ -112,7 +113,8 @@ export class Tab2Page implements OnInit {
           console.log('logout');
           localStorage.clear();
           this.auth.setLoggedIn(false)
-          this.router.navigateByUrl('/login', { skipLocationChange: true });
+          modalController.dismiss()
+          this.router.navigateByUrl('/login', { skipLocationChange: true});
         }
       }]
     });
